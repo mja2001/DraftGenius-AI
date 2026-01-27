@@ -307,5 +307,121 @@ Respond in JSON format:
     }
   });
 
+  // Comprehensive AI draft analysis
+  app.post("/api/draft-analysis", async (req, res) => {
+    try {
+      const { bluePicks, redPicks, blueBans, redBans, phase, activeTeam } = req.body;
+      const allChampions = await storage.getChampions();
+
+      const getChampName = (id: string | null) => {
+        if (!id) return null;
+        return allChampions.find(c => c.id === id)?.name || id;
+      };
+
+      const bluePickNames = bluePicks.filter((p: string | null) => p).map(getChampName);
+      const redPickNames = redPicks.filter((p: string | null) => p).map(getChampName);
+      const blueBanNames = blueBans.filter((b: string | null) => b).map(getChampName);
+      const redBanNames = redBans.filter((b: string | null) => b).map(getChampName);
+
+      const blueChamps = bluePicks
+        .filter((id: string | null): id is string => id !== null)
+        .map((id: string) => allChampions.find(c => c.id === id))
+        .filter((c: any): c is NonNullable<typeof c> => c !== undefined);
+
+      const redChamps = redPicks
+        .filter((id: string | null): id is string => id !== null)
+        .map((id: string) => allChampions.find(c => c.id === id))
+        .filter((c: any): c is NonNullable<typeof c> => c !== undefined);
+
+      const unavailable = [
+        ...blueBans.filter((id: string | null) => id !== null),
+        ...redBans.filter((id: string | null) => id !== null),
+        ...bluePicks.filter((id: string | null) => id !== null),
+        ...redPicks.filter((id: string | null) => id !== null),
+      ];
+
+      const availableChampions = allChampions
+        .filter(c => !unavailable.includes(c.id))
+        .sort((a, b) => b.winRate - a.winRate)
+        .slice(0, 15);
+
+      const prompt = `You are an expert League of Legends analyst. Analyze this draft state and provide detailed insights.
+
+CURRENT DRAFT STATE:
+- Phase: ${phase} (${phase === "ban1" ? "First ban phase" : phase === "pick1" ? "First pick phase" : phase === "ban2" ? "Second ban phase" : "Second pick phase"})
+- Active team: ${activeTeam} side
+
+BLUE SIDE:
+- Picks: ${bluePickNames.length > 0 ? bluePickNames.join(", ") : "None yet"}
+- Bans: ${blueBanNames.length > 0 ? blueBanNames.join(", ") : "None yet"}
+
+RED SIDE:
+- Picks: ${redPickNames.length > 0 ? redPickNames.join(", ") : "None yet"}
+- Bans: ${redBanNames.length > 0 ? redBanNames.join(", ") : "None yet"}
+
+AVAILABLE HIGH-PRIORITY CHAMPIONS:
+${availableChampions.map(c => `- ${c.name} (${c.role}, ${c.winRate}% WR, tags: ${c.tags.join(", ")})`).join("\n")}
+
+Provide a comprehensive analysis in the following JSON format:
+{
+  "topRecommendations": [
+    {"champion": "ChampionName", "championId": "ChampionId", "score": 85, "reasoning": "Detailed explanation of why this pick/ban is strong"}
+  ],
+  "compositionAnalysis": {
+    "blueTeam": {
+      "damageType": "description of damage split (AD/AP/mixed)",
+      "engagePotential": "description of engage tools",
+      "scaling": "early/mid/late game power",
+      "synergies": ["list of champion synergies"]
+    },
+    "redTeam": {
+      "damageType": "description",
+      "engagePotential": "description",
+      "scaling": "description",
+      "synergies": ["list"]
+    }
+  },
+  "winProbability": {
+    "blueWinChance": 52,
+    "redWinChance": 48,
+    "keyFactors": ["factor1", "factor2", "factor3"]
+  },
+  "draftWeaknesses": {
+    "blueTeam": ["weakness1", "weakness2"],
+    "redTeam": ["weakness1", "weakness2"]
+  },
+  "strategicAdvice": "2-3 sentences of overall strategic advice for the active team"
+}
+
+Provide exactly 3 recommendations. Be specific and analytical.`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-5.1",
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 2048,
+      });
+
+      const content = response.choices[0]?.message?.content || "{}";
+      const analysis = JSON.parse(content);
+
+      res.json({
+        success: true,
+        draftState: {
+          bluePicks: bluePickNames,
+          redPicks: redPickNames,
+          blueBans: blueBanNames,
+          redBans: redBanNames,
+          phase,
+          activeTeam,
+        },
+        analysis,
+      });
+    } catch (error) {
+      console.error("Error generating draft analysis:", error);
+      res.status(500).json({ error: "Failed to generate draft analysis" });
+    }
+  });
+
   return httpServer;
 }
