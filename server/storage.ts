@@ -1,6 +1,7 @@
 import { type User, type InsertUser } from "@shared/schema";
 import type { Champion, ChampionRole, ChampionTag } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { createGridClient, GridClient } from "./grid-client";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -8,6 +9,8 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getChampions(role?: string): Promise<Champion[]>;
   getChampionById(id: string): Promise<Champion | undefined>;
+  testGridConnection(): Promise<{ connected: boolean; teams?: string[]; error?: string }>;
+  getGridTeams(): Promise<string[]>;
 }
 
 const createChampion = (
@@ -150,15 +153,23 @@ const CHAMPIONS: Champion[] = [
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private champions: Map<string, Champion>;
+  private gridClient: GridClient | null;
 
   constructor() {
     this.users = new Map();
     this.champions = new Map();
+    this.gridClient = createGridClient();
     
-    // Initialize champions
+    // Initialize champions with mock data (used as fallback)
     CHAMPIONS.forEach(champ => {
       this.champions.set(champ.id, champ);
     });
+
+    if (this.gridClient) {
+      console.log("GRID API client initialized");
+    } else {
+      console.log("Using mock champion data (GRID_API_KEY not set)");
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -188,6 +199,37 @@ export class MemStorage implements IStorage {
 
   async getChampionById(id: string): Promise<Champion | undefined> {
     return this.champions.get(id);
+  }
+
+  async testGridConnection(): Promise<{ connected: boolean; teams?: string[]; error?: string }> {
+    if (!this.gridClient) {
+      return { connected: false, error: "GRID_API_KEY not configured" };
+    }
+
+    try {
+      const isConnected = await this.gridClient.testConnection();
+      if (isConnected) {
+        const teams = await this.gridClient.getTeams(20);
+        return { connected: true, teams };
+      } else {
+        return { connected: false, error: "Failed to connect to GRID API" };
+      }
+    } catch (error) {
+      return { connected: false, error: String(error) };
+    }
+  }
+
+  async getGridTeams(): Promise<string[]> {
+    if (!this.gridClient) {
+      return [];
+    }
+
+    try {
+      return await this.gridClient.getTeams(50);
+    } catch (error) {
+      console.error("Error fetching GRID teams:", error);
+      return [];
+    }
   }
 }
 

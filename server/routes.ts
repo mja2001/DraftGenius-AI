@@ -13,6 +13,28 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
+  // Test GRID API connection
+  app.get("/api/grid/test", async (req, res) => {
+    try {
+      const result = await storage.testGridConnection();
+      res.json(result);
+    } catch (error) {
+      console.error("Error testing GRID connection:", error);
+      res.status(500).json({ connected: false, error: String(error) });
+    }
+  });
+
+  // Get teams from GRID API
+  app.get("/api/grid/teams", async (req, res) => {
+    try {
+      const teams = await storage.getGridTeams();
+      res.json({ teams });
+    } catch (error) {
+      console.error("Error fetching GRID teams:", error);
+      res.status(500).json({ error: "Failed to fetch teams" });
+    }
+  });
+
   // Get all champions
   app.get("/api/champions", async (req, res) => {
     try {
