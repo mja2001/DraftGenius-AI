@@ -37,3 +37,11 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[agent]
+integrations = ["javascript_openai_ai_integrations:2.0.0", "javascript_mem_db:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+GRID_API_KEY = "3Q5pM9sqQnMHQOIvyag3qNmkzgtYHSCIU9SDq7As"

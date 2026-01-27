@@ -1,14 +1,4 @@
-import { type User, type InsertUser } from "@shared/schema";
 import type { Champion, ChampionRole, ChampionTag } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  getChampions(role?: string): Promise<Champion[]>;
-  getChampionById(id: string): Promise<Champion | undefined>;
-}
 
 const createChampion = (
   id: string,
@@ -35,7 +25,7 @@ const createChampion = (
   tier: tier || "B",
 });
 
-const CHAMPIONS: Champion[] = [
+export const CHAMPIONS: Champion[] = [
   // TOP LANERS
   createChampion("Aatrox", "Aatrox", "top", 51.2, 8.5, 12.3, ["fighter", "sustain", "engage"], ["Fiora", "Irelia", "Vayne"], ["Orianna", "Lulu", "Thresh"], "A"),
   createChampion("Camille", "Camille", "top", 50.8, 6.2, 8.1, ["fighter", "split-push", "burst"], ["Jax", "Renekton", "Darius"], ["LeeSin", "Orianna", "Rakan"], "A"),
@@ -70,7 +60,7 @@ const CHAMPIONS: Champion[] = [
   createChampion("Lillia", "Lillia", "jungle", 51.8, 5.8, 7.2, ["mage", "scaling", "cc"], ["LeeSin", "Elise", "Rengar"], ["Orianna", "Azir", "Jinx"], "A"),
   createChampion("Nidalee", "Nidalee", "jungle", 48.5, 4.2, 3.5, ["assassin", "poke", "early-game"], ["Rammus", "Sejuani", "Udyr"], ["Renekton", "Jayce", "Orianna"], "C"),
   createChampion("Nocturne", "Nocturne", "jungle", 51.2, 5.5, 4.2, ["assassin", "engage", "burst"], ["Rammus", "Sejuani", "Lissandra"], ["Orianna", "Lulu", "Karma"], "B"),
-  createChampion("RekSai", "Rek'Sai", "jungle", 50.5, 4.8, 3.8, ["fighter", "early-game", "engage"], ["Warwick", "Udyr", "Trundle"], ["Orianna", "Syndra", "Azir"], "B"),
+  createChampion("Rek'Sai", "Rek'Sai", "jungle", 50.5, 4.8, 3.8, ["fighter", "early-game", "engage"], ["Warwick", "Udyr", "Trundle"], ["Orianna", "Syndra", "Azir"], "B"),
   createChampion("Sejuani", "Sejuani", "jungle", 51.5, 4.5, 3.2, ["tank", "engage", "cc"], ["Olaf", "Trundle", "Kindred"], ["Orianna", "Azir", "Aphelios"], "A"),
   createChampion("Viego", "Viego", "jungle", 49.8, 8.2, 9.5, ["fighter", "burst", "scaling"], ["Rammus", "Sejuani", "Elise"], ["Orianna", "Lulu", "Renata"], "B"),
   createChampion("Vi", "Vi", "jungle", 51.8, 6.5, 5.8, ["fighter", "engage", "cc"], ["Graves", "Kindred", "Morgana"], ["Orianna", "Syndra", "Jinx"], "A"),
@@ -81,7 +71,7 @@ const CHAMPIONS: Champion[] = [
   createChampion("Akali", "Akali", "mid", 48.5, 7.2, 12.5, ["assassin", "burst", "split-push"], ["Galio", "Lissandra", "Malzahar"], ["LeeSin", "Elise", "Nidalee"], "B"),
   createChampion("Anivia", "Anivia", "mid", 52.8, 3.5, 2.2, ["mage", "scaling", "cc"], ["Kassadin", "Fizz", "LeBlanc"], ["JarvanIV", "Sejuani", "Hecarim"], "A"),
   createChampion("Annie", "Annie", "mid", 52.2, 3.2, 1.8, ["mage", "burst", "engage"], ["Xerath", "Lux", "Syndra"], ["LeeSin", "Hecarim", "Wukong"], "B"),
-  createChampion("AurelionSol", "Aurelion Sol", "mid", 51.8, 4.5, 5.2, ["mage", "scaling", "poke"], ["Fizz", "Zed", "Yasuo"], ["JarvanIV", "Sejuani", "Vi"], "A"),
+  createChampion("Aurelion Sol", "Aurelion Sol", "mid", 51.8, 4.5, 5.2, ["mage", "scaling", "poke"], ["Fizz", "Zed", "Yasuo"], ["JarvanIV", "Sejuani", "Vi"], "A"),
   createChampion("Azir", "Azir", "mid", 47.8, 5.8, 4.5, ["mage", "scaling", "poke"], ["Xerath", "Syndra", "LeBlanc"], ["Sejuani", "Wukong", "Hecarim"], "B"),
   createChampion("Cassiopeia", "Cassiopeia", "mid", 51.2, 3.8, 2.5, ["mage", "scaling", "sustain"], ["Xerath", "Syndra", "Viktor"], ["Sejuani", "Hecarim", "Vi"], "A"),
   createChampion("Corki", "Corki", "mid", 49.5, 4.2, 2.8, ["marksman", "poke", "scaling"], ["Kassadin", "Fizz", "Akali"], ["Sejuani", "Vi", "JarvanIV"], "B"),
@@ -114,7 +104,7 @@ const CHAMPIONS: Champion[] = [
   createChampion("Jinx", "Jinx", "adc", 51.5, 11.5, 6.2, ["marksman", "scaling", "cc"], ["Draven", "Lucian", "Samira"], ["Thresh", "Lulu", "Nautilus"], "A"),
   createChampion("KaiSa", "Kai'Sa", "adc", 49.5, 13.2, 7.8, ["marksman", "burst", "scaling"], ["Draven", "MissFortune", "Lucian"], ["Nautilus", "Thresh", "Leona"], "B"),
   createChampion("Kalista", "Kalista", "adc", 48.8, 4.5, 5.2, ["marksman", "early-game", "cc"], ["Caitlyn", "Ashe", "MissFortune"], ["Thresh", "Renata", "Nautilus"], "C"),
-  createChampion("Lucian", "Lucian", "adc", 49.2, 8.8, 4.5, ["marksman", "early-game", "burst"], ["Caitlyn", "Jinx", "KogMaw"], ["Nami", "Braum", "Thresh"], "B"),
+  createChampion("Lucian", "Lucian", "adc", 49.2, 8.8, 4.5, ["marksman", "early-game", "burst"], ["Caitlyn", "Jinx", "Kog'Maw"], ["Nami", "Braum", "Thresh"], "B"),
   createChampion("MissFortune", "Miss Fortune", "adc", 51.8, 9.5, 5.8, ["marksman", "poke", "cc"], ["Samira", "Vayne", "Draven"], ["Leona", "Nautilus", "Amumu"], "A"),
   createChampion("Samira", "Samira", "adc", 49.8, 7.5, 9.2, ["marksman", "burst", "engage"], ["Caitlyn", "Ashe", "Jhin"], ["Rell", "Nautilus", "Leona"], "B"),
   createChampion("Sivir", "Sivir", "adc", 50.5, 5.8, 3.2, ["marksman", "poke", "scaling"], ["Draven", "Samira", "Lucian"], ["Karma", "Lulu", "Yuumi"], "B"),
@@ -128,67 +118,48 @@ const CHAMPIONS: Champion[] = [
   createChampion("Alistar", "Alistar", "support", 50.8, 4.5, 3.2, ["tank", "engage", "cc"], ["Morgana", "Janna", "Zyra"], ["Kalista", "Samira", "Yasuo"], "B"),
   createChampion("Bard", "Bard", "support", 51.5, 5.2, 3.8, ["support", "cc", "poke"], ["Leona", "Nautilus", "Blitzcrank"], ["Caitlyn", "Jhin", "Ashe"], "A"),
   createChampion("Blitzcrank", "Blitzcrank", "support", 51.2, 6.8, 8.5, ["tank", "engage", "cc"], ["Morgana", "Sivir", "Ezreal"], ["Samira", "Draven", "Lucian"], "A"),
-  createChampion("Braum", "Braum", "support", 50.5, 4.2, 2.8, ["tank", "engage", "cc"], ["Zyra", "Brand", "VelKoz"], ["Lucian", "Kalista", "Samira"], "B"),
-  createChampion("Janna", "Janna", "support", 52.5, 5.8, 3.2, ["support", "cc", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "KogMaw", "Twitch"], "A"),
+  createChampion("Braum", "Braum", "support", 50.5, 4.2, 2.8, ["tank", "engage", "cc"], ["Zyra", "Brand", "Vel'Koz"], ["Lucian", "Kalista", "Samira"], "B"),
+  createChampion("Janna", "Janna", "support", 52.5, 5.8, 3.2, ["support", "cc", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Kog'Maw", "Twitch"], "A"),
   createChampion("Karma", "Karma", "support", 49.8, 6.5, 3.5, ["mage", "poke", "support"], ["Blitzcrank", "Leona", "Nautilus"], ["Caitlyn", "Ezreal", "Sivir"], "B"),
   createChampion("Leona", "Leona", "support", 51.5, 8.2, 6.5, ["tank", "engage", "cc"], ["Morgana", "Janna", "Zyra"], ["Samira", "MissFortune", "Draven"], "A"),
-  createChampion("Lulu", "Lulu", "support", 51.8, 9.5, 7.2, ["support", "cc", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "KogMaw", "Twitch"], "S"),
-  createChampion("Milio", "Milio", "support", 52.2, 7.8, 8.5, ["support", "cc", "sustain"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "KogMaw", "Aphelios"], "S"),
+  createChampion("Lulu", "Lulu", "support", 51.8, 9.5, 7.2, ["support", "cc", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Kog'Maw", "Twitch"], "S"),
+  createChampion("Milio", "Milio", "support", 52.2, 7.8, 8.5, ["support", "cc", "sustain"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Kog'Maw", "Aphelios"], "S"),
   createChampion("Morgana", "Morgana", "support", 51.2, 7.5, 5.8, ["mage", "cc", "support"], ["Zyra", "Brand", "Xerath"], ["Caitlyn", "Jhin", "Jinx"], "A"),
   createChampion("Nami", "Nami", "support", 51.5, 8.8, 4.5, ["support", "cc", "sustain"], ["Blitzcrank", "Leona", "Nautilus"], ["Lucian", "Jhin", "Draven"], "A"),
   createChampion("Nautilus", "Nautilus", "support", 50.8, 9.2, 9.8, ["tank", "engage", "cc"], ["Morgana", "Janna", "Zyra"], ["Samira", "MissFortune", "Draven"], "A"),
   createChampion("Pyke", "Pyke", "support", 49.5, 6.5, 7.8, ["assassin", "engage", "cc"], ["Morgana", "Janna", "Lulu"], ["Draven", "Samira", "Lucian"], "B"),
   createChampion("Rakan", "Rakan", "support", 50.5, 5.8, 4.2, ["support", "engage", "cc"], ["Morgana", "Janna", "Alistar"], ["Xayah", "Samira", "Kalista"], "B"),
   createChampion("Rell", "Rell", "support", 50.8, 3.5, 2.5, ["tank", "engage", "cc"], ["Morgana", "Janna", "Zyra"], ["Samira", "MissFortune", "Yasuo"], "B"),
-  createChampion("Renata", "Renata Glasc", "support", 50.2, 4.8, 3.8, ["support", "cc", "sustain"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Aphelios", "KogMaw"], "B"),
+  createChampion("Renata", "Renata Glasc", "support", 50.2, 4.8, 3.8, ["support", "cc", "sustain"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Aphelios", "Kog'Maw"], "B"),
   createChampion("Senna", "Senna", "support", 50.5, 8.2, 5.5, ["marksman", "support", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Caitlyn", "Jhin", "Ashe"], "B"),
   createChampion("Thresh", "Thresh", "support", 49.8, 11.5, 6.2, ["tank", "engage", "cc"], ["Morgana", "Janna", "Zyra"], ["Samira", "Draven", "Lucian"], "A"),
-  createChampion("Yuumi", "Yuumi", "support", 48.5, 5.2, 12.5, ["support", "sustain", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Twitch", "KogMaw"], "C"),
+  createChampion("Yuumi", "Yuumi", "support", 48.5, 5.2, 12.5, ["support", "sustain", "poke"], ["Blitzcrank", "Leona", "Nautilus"], ["Jinx", "Twitch", "Kog'Maw"], "C"),
   createChampion("Zyra", "Zyra", "support", 51.8, 4.5, 2.8, ["mage", "poke", "cc"], ["Blitzcrank", "Leona", "Nautilus"], ["Caitlyn", "Jhin", "Ashe"], "A"),
 ];
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private champions: Map<string, Champion>;
+export const getChampionById = (id: string): Champion | undefined => {
+  return CHAMPIONS.find(c => c.id === id);
+};
 
-  constructor() {
-    this.users = new Map();
-    this.champions = new Map();
-    
-    // Initialize champions
-    CHAMPIONS.forEach(champ => {
-      this.champions.set(champ.id, champ);
-    });
-  }
+export const getChampionsByRole = (role: ChampionRole): Champion[] => {
+  return CHAMPIONS.filter(c => c.role === role);
+};
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
-  }
+export const getAvailableChampions = (
+  bannedIds: string[],
+  pickedIds: string[]
+): Champion[] => {
+  const unavailable = new Set([...bannedIds, ...pickedIds]);
+  return CHAMPIONS.filter(c => !unavailable.has(c.id));
+};
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
-  }
-
-  async getChampions(role?: string): Promise<Champion[]> {
-    const allChampions = Array.from(this.champions.values());
-    if (role) {
-      return allChampions.filter(c => c.role === role);
-    }
-    return allChampions;
-  }
-
-  async getChampionById(id: string): Promise<Champion | undefined> {
-    return this.champions.get(id);
-  }
-}
-
-export const storage = new MemStorage();
+export const getRoleIcon = (role: ChampionRole): string => {
+  const icons: Record<ChampionRole, string> = {
+    top: "🗡️",
+    jungle: "🌲",
+    mid: "⚡",
+    adc: "🏹",
+    support: "🛡️",
+  };
+  return icons[role];
+};

@@ -81,6 +81,17 @@ export default {
           busy: "rgb(239 68 68)",
           offline: "rgb(156 163 175)",
         },
+        "blue-team": {
+          DEFAULT: "hsl(var(--blue-team) / <alpha-value>)",
+          glow: "hsl(var(--blue-team-glow) / <alpha-value>)",
+        },
+        "red-team": {
+          DEFAULT: "hsl(var(--red-team) / <alpha-value>)",
+          glow: "hsl(var(--red-team-glow) / <alpha-value>)",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--gold-accent) / <alpha-value>)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
